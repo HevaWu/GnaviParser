@@ -3,8 +3,8 @@ import math
 
 fields = ['area_list', 'tags_list', 'name', 'description', 'url', 'category', 'address', 'access', 'business_hours', 'regular_holidays', 'price', 'phone_no', 'if_reservation_needed']
 
-param = 'visit'
-base_path = '../data/walkerplus_' + param + '.csv'
+param = 'shopping'
+base_path = '../data/raw/walkerplus_' + param + '_fix_missing.csv'
 sub_path = '../data/walkerplus_' + param + '_'
 
 def main():
@@ -29,20 +29,41 @@ def read_from_CSV(path):
         for rows in csvReader:
             data = {}
             data['name'] = rows['name']
-            data['area_list'] = rows['area_list']
-            data['description'] = rows['description']
-            data['url'] = rows['url']
-            data['category'] = rows['category']
-            data['tags_list'] = rows['tags_list']
-            data['address'] = rows['address']
-            data['access'] = rows['access']
-            data['business_hours'] = rows['business_hours']
-            data['regular_holidays'] = rows['regular_holidays']
-            data['price'] = rows['price']
-            data['phone_no'] = rows['phone_no']
-            data['if_reservation_needed'] = rows['if_reservation_needed']
+            data['area_list'] = rows[' area_list']
+            data['description'] = rows[' description']
+            data['url'] = rows[' url']
+            data['category'] = rows[' category']
+            data['tags_list'] = rows[' tags_list']
+            data['address'] = rows[' address']
+            data['access'] = rows[' access']
+            data['business_hours'] = rows[' business_hours']
+            data['regular_holidays'] = rows[' regular_holidays']
+            data['price'] = rows[' tarif']
+            data['phone_no'] = rows[' phone_no']
+            data['if_reservation_needed'] = rows[' if_reservation_needed']
 
-            lists.append(data)
+            tags = data['tags_list'].split()
+            areas = data['area_list'].split()
+
+            if tags and areas:
+                for tag in tags:
+                    for area in areas:
+                        newData = data.copy()
+                        newData['tags_list'] = tag.replace("'", "")
+                        newData['area_list'] = area.replace("'", "")
+                        lists.append(newData)
+            elif tags:
+                for tag in tags:
+                    newData = data.copy()
+                    newData['tags_list'] = tag
+                    lists.append(newData)
+            elif areas:
+                for area in areas:
+                    newData = data.copy()
+                    newData['area_list'] = area
+                    lists.append(newData)
+            else:
+                lists.append(data)
 
         return lists
 
