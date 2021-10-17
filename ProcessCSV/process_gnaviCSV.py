@@ -1,11 +1,18 @@
 import csv
+import math
+
+fields = ['name','url','address','access','category','description','average_price','pet_dog_small','pet_dog_medium','pet_dog_large','pet_cat','pet_others','pet_otherInfo']
 
 def main():
     lists = read_from_CSV('../data/raw/gnavi_fix_missing.csv')
-    write_to_CSV(lists, '../data/gnavi.csv')
+    lists.sort(key=lambda x: x['category'])
+    list_count =  math.ceil(len(lists) / 2000)
+    for i in range(list_count):
+        sub_list = lists[(i*2000) : (i+1)*2000]
+        write_to_file(sub_list, i)
 
-def write_to_CSV(lists, path):
-    fields = ['name','url','address','access','category','description','average_price','pet_dog_small','pet_dog_medium','pet_dog_large','pet_cat','pet_others','pet_otherInfo']
+def write_to_file(lists, index):
+    path = '../data/gnavi_' + str(index) + '.csv'
     with open(path, 'w') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=fields)
         writer.writeheader()
@@ -44,7 +51,7 @@ def read_from_CSV(path):
                 category = "中華料理"
             elif "海鮮" in category:
                 category = "海鮮料理"
-            elif "イタリア" in category or "イタリア" in data['name'] or "ピザ" in category:
+            elif "イタリア" in category or "イタリア" in data['name'] or "ピザ" in category or "イタリアン" in category:
                 category = "イタリアン料理"
             elif "フランス" in category or "フレンチ" in category:
                 category = "フランス料理"
@@ -89,6 +96,7 @@ def read_from_CSV(path):
 
             data['category'] = category
 
+            print(data['description'], category)
             lists.append(data)
 
             data_set.add(data['address'])
